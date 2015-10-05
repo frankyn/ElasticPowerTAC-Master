@@ -1,0 +1,3 @@
+[submodule "DigitalOceanAPIv2"]
+	path = DigitalOceanAPIv2
+	url = https://github.com/frankyn/DigitalOceanAPIv2.git
