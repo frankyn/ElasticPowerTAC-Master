@@ -1,0 +1,17 @@
+{
+	"slave-name":"slavename",
+	"slave-image":{"id":"234234234",
+					"size":"512mb",
+					"region":"sfo1",
+					"ssh_keys":["234234"]},
+	"api-key":"234234234234",
+	"local-ip":"xxx.xxx.xxx.xxx",
+	"slaves-used":2,
+	"simulations":[{
+		"name":"simulation-name",
+		"simulation":"config-sim-01",
+	},{
+		"name":"simulation-name",
+		"simulation":"config-sim-02",
+	}]
+}

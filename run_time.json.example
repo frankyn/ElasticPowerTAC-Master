@@ -1,0 +1,8 @@
+{
+	"slaves":[
+	{"droplet_id":234234,
+	 "droplet_ip":"xxx.xxx.xxx.xxx"},
+	{"droplet_id":234234,
+	 "droplet_ip":"xxx.xxx.xxx.xxx"}
+	]
+}
