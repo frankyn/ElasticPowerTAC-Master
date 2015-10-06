@@ -149,7 +149,7 @@ class ElasticPowerTAC_Master:
 
 			# Run ElasticPowerTAC-Slave
 			cmd_run = ['ssh','root@%s'%slave_ip,
-					   'screen -A -m -d -S "slave" "python ~/ElasticPowerTAC-Slave/run.py"']
+					   '"cd ~/ElasticPowerTAC-Slave/;python run.py  < /dev/null > /tmp/master-log 2>&1 &"']
 			subprocess.call(cmd_run)
 
 
