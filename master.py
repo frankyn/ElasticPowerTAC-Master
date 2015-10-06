@@ -51,7 +51,7 @@ class ElasticPowerTAC_Master:
 					actions_all_completed = False
 			if not actions_all_completed:
 				# If not finished sleep for 1 minute
-				time.sleep(60)
+				time.sleep(30)
 			else:
 				break
 
@@ -63,7 +63,7 @@ class ElasticPowerTAC_Master:
 		# slave_id container
 		self._slaves_id = []
 
-		for x in range(slaves_used):
+		for x in range(self._slaves_used):
 			# Create master with specified image id
 			status,new_droplet = self._docean.request_create(
 									self._config['slave-name'],
@@ -73,21 +73,21 @@ class ElasticPowerTAC_Master:
 									self._config['slave-image']['ssh_keys'])
 			# Check status
 			if status != 202:
-				print('Unable to create master droplet')
+				print('Unable to create slave droplet')
 				exit()
 
 			self._slaves_id.append(new_droplet['droplet']['id'])
 
 
 		# wait for creation action to finish
-		print('Initilized creation process of master')
+		print('Initilized creation process of slaves')
 
 		# Poll actions every minute until all have finished
 		for droplet_id in self._slaves_id:
 			self.wait_until_completed(droplet_id)
 
 		# Completed
-		print('Finished creating Slave Droplets(%s)'%(','.join(self._slaves_id)))
+		print('Finished creating Slave Droplets')
 
 
 	# setup slave environment
@@ -98,9 +98,9 @@ class ElasticPowerTAC_Master:
 		for droplet in response['droplets']:
 			if droplet['id'] in self._slaves_id:
 				self._slaves.append({"id":droplet['id'],
-									 "ip":droplet['networks']['v4'][0]['ip_address'])
+									 "ip":droplet['networks']['v4'][0]['ip_address']})
 
-		simulation_partition_size = len(slave_config['simulations'])//self._slaves_used
+		simulation_partition_size = len(self._config['simulations'])//self._slaves_used
 		for x in range(len(self._slaves)):
 			slave_ip = self._slaves[x]['ip']
 			# Setup slave_config dict
@@ -128,8 +128,8 @@ class ElasticPowerTAC_Master:
 				f.write(json.dumps(slave_config))
 
 			# Clone ElasticPowerTAC-Simulation
-			cmd_clone = ['ssh','-o StrictHostKeyChecking=no','log@%s'%self._master_ip,
-			'"git clone --recursive https://github.com/frankyn/ElasticPowerTAC-Simulation.git"']
+			cmd_clone = ['ssh','-o StrictHostKeyChecking=no','log@%s'%slave_ip,
+			'git clone --recursive https://github.com/frankyn/ElasticPowerTAC-Simulation.git']
 			subprocess.call(cmd_clone)
 
 			# SCP master.config.json to Slave server
@@ -137,14 +137,9 @@ class ElasticPowerTAC_Master:
 				   	   'log@%s:%s'%(slave_ip,'~/ElasticPowerTAC-Simulation/config.json')]
 			subprocess.call(cmd_mcj)
 
-			# Clone Simulation Configurations
-			cmd_clone = ['ssh','log@%s'%self._master_ip,
-			'"git clone --recursive https://github.com/frankyn/ElasticPowerTAC-Simulation-Config.git"']
-			subprocess.call(cmd_clone)
-
 			# Clone ElasticPowerTAC-Slave 
-			cmd_clone = ['ssh','-o StrictHostKeyChecking=no','root@%s'%self._master_ip,
-			'"git clone --recursive https://github.com/frankyn/ElasticPowerTAC-Slave.git"']
+			cmd_clone = ['ssh','-o StrictHostKeyChecking=no','root@%s'%slave_ip,
+			'git clone --recursive https://github.com/frankyn/ElasticPowerTAC-Slave.git']
 			subprocess.call(cmd_clone)
 
 			# SCP master.config.json to Slave server
@@ -154,7 +149,7 @@ class ElasticPowerTAC_Master:
 
 			# Run ElasticPowerTAC-Slave
 			cmd_run = ['ssh','root@%s'%slave_ip,
-					   '"screen -A -m -d -S \"slave\" \"python ~/ElasticPowerTAC-Slave/run.py\""']
+					   'screen -A -m -d -S "slave" "python ~/ElasticPowerTAC-Slave/run.py"']
 			subprocess.call(cmd_run)
 
 
