@@ -7,6 +7,8 @@
 	"api-key":"234234234234",
 	"local-ip":"xxx.xxx.xxx.xxx",
 	"slaves-used":2,
+	"google-api":null,
+	"master-droplet-id":null,
 	"simulations":[{
 		"name":"simulation-name",
 		"simulation":"config-sim-01",

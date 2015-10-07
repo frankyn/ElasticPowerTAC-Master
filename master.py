@@ -25,6 +25,11 @@ class ElasticPowerTAC_Master:
 		# Create DOcean API Wrapper
 		self._docean = DOcean(self._config['api-key'])
 
+		# Check if Google Drive will be used
+		# If so once all the children are initialized we kill the master
+		if self._config['google-drive']:
+			self._master_droplet_id = self._config['master-droplet-id']
+
 	# load_config
 	def load_config(self):
 		# load from "config.json"
@@ -100,6 +105,8 @@ class ElasticPowerTAC_Master:
 				self._slaves.append({"id":droplet['id'],
 									 "ip":droplet['networks']['v4'][0]['ip_address']})
 
+		# COPY OVER session.json file to each slave
+		# Kill Master once completed
 		simulation_partition_size = len(self._config['simulations'])//self._slaves_used
 		for x in range(len(self._slaves)):
 			slave_ip = self._slaves[x]['ip']
@@ -111,6 +118,10 @@ class ElasticPowerTAC_Master:
 			part_start = simulation_partition_size*x
 			part_end = simulation_partition_size*x+simulation_partition_size
 			simulation_config['simulations'] = self._config['simulations'][part_start:part_end]
+			if self._config['google-drive']:
+				simulation_config['google-drive'] = True
+			else:
+				simulation_config['google-drive'] = False
 
 			simulation_config_file = 'simulation.config.json'
 			
@@ -123,6 +134,7 @@ class ElasticPowerTAC_Master:
 			slave_config = {}
 			slave_config['droplet_id'] = self._slaves[x]['id']
 			slave_config['api-key'] = self._config['api-key']
+			slave_config['google-drive'] = self._config['google-drive']
 			slave_config_file = 'slave.config.json'
 			with open(slave_config_file,'w+') as f:
 				f.write(json.dumps(slave_config))
@@ -147,14 +159,26 @@ class ElasticPowerTAC_Master:
 				   	   'root@%s:%s'%(slave_ip,'~/ElasticPowerTAC-Slave/config.json')]
 			subprocess.call(cmd_mcj)
 
+			# SCP google-session.json
+			if self._config['google-drive']:
+				cmd_gd = ['scp','google-session.json',
+						  'root@%s:%s'%(slave_ip,'~/ElasticPowerTAC-Slave/google-session.json')]
+				subprocess.call(cmd_gd)
+
 			# Run ElasticPowerTAC-Slave
 			cmd_run = ['ssh','root@%s'%slave_ip,
 					   'cd ~/ElasticPowerTAC-Slave/;python run.py  < /dev/null > /tmp/slave-log 2>&1 &']
 			subprocess.call(cmd_run)
 
-
-
 		print("Slaves have been initialized!")
+
+		if self._config['google-drive']:
+			self.cleanup_master()
+
+	# called when google drive is the backup location
+	def cleanup_master(self):
+		self._docean.request_delete(self._config['master-droplet-id'])
+		print('Goodbye.')
 
 
 
