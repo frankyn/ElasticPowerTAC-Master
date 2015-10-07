@@ -47,18 +47,35 @@ class ElasticPowerTAC_Master:
 	# Wait creation process
 	def wait_until_completed(self,droplet_id):
 		# poll until last action is completed.
-		while True:
+		actions_all_completed = False
+		while not actions_all_completed:
 			actions = self._docean.request_droplet_actions(droplet_id)
 			# Check all actions are complete
 			actions_all_completed = True
 			for action in actions['actions']:
 				if action['status'] != 'completed':
 					actions_all_completed = False
+
+
 			if not actions_all_completed:
 				# If not finished sleep for 1 minute
 				time.sleep(60)
 			else:
-				break
+				# Attempt an ssh
+				ssh_all_completed = False
+				while not ssh_all_completed:
+					try:
+						response = self._docean.request_droplets()
+						for droplet in response['droplets']:
+							if droplet['id'] in self._slaves_id:
+								cmd_ls = ['ssh','-o StrictHostKeyChecking=no','root@%s'%droplet['networks']['v4'][0]['ip_address'],'ls']
+								subprocess.call(cmd_ls)
+
+						# All passed
+						ssh_all_completed = True
+					except:
+						time.sleep(30)
+						ssh_all_completed = False
 
 	# setup slave droplets
 	def setup_slave_droplets(self):
@@ -95,6 +112,8 @@ class ElasticPowerTAC_Master:
 		print('Finished creating Slave Droplets')
 
 
+
+
 	# setup slave environment
 	def setup_slave_environment(self):
 		# Retrieve IP Address of Master Droplet
@@ -105,8 +124,7 @@ class ElasticPowerTAC_Master:
 				self._slaves.append({"id":droplet['id'],
 									 "ip":droplet['networks']['v4'][0]['ip_address']})
 
-		# COPY OVER session.json file to each slave
-		# Kill Master once completed
+
 		simulation_partition_size = len(self._config['simulations'])//self._slaves_used
 		for x in range(len(self._slaves)):
 			slave_ip = self._slaves[x]['ip']
