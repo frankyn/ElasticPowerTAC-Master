@@ -69,8 +69,9 @@ class ElasticPowerTAC_Master:
 						for droplet in response['droplets']:
 							if droplet['id'] in self._slaves_id:
 								cmd_ls = ['ssh','-o StrictHostKeyChecking=no','root@%s'%droplet['networks']['v4'][0]['ip_address'],'ls']
-								subprocess.call(cmd_ls)
-
+								handle = subprocess.call(cmd_ls)
+								if handle != 0:
+									raise "command error"
 						# All passed
 						ssh_all_completed = True
 					except:
