@@ -160,7 +160,7 @@ class ElasticPowerTAC_Master:
 
 			# Clone ElasticPowerTAC-Simulation
 			cmd_clone = ['ssh','-o StrictHostKeyChecking=no','log@%s'%slave_ip,
-			'git clone --recursive https://github.com/frankyn/ElasticPowerTAC-Simulation.git;cd ElasticPowerTAC-Simulation/ElasticPowerTAC-Simulation-Config; git lfs pull']
+			'git clone --recursive https://github.com/frankyn/ElasticPowerTAC-Simulation.git']
 			subprocess.call(cmd_clone)
 
 			# SCP master.config.json to Slave server
