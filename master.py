@@ -160,7 +160,7 @@ class ElasticPowerTAC_Master:
 
 			# Clone ElasticPowerTAC-Simulation
 			cmd_clone = ['ssh','-o StrictHostKeyChecking=no','log@%s'%slave_ip,
-			'git clone --recursive https://github.com/frankyn/ElasticPowerTAC-Simulation.git']
+			'git clone --recursive https://github.com/frankyn/ElasticPowerTAC-Simulation.git;cd ElasticPowerTAC-Simulation/ElasticPowerTAC-Simulation-Config; git lfs pull']
 			subprocess.call(cmd_clone)
 
 			# SCP master.config.json to Slave server
@@ -188,6 +188,7 @@ class ElasticPowerTAC_Master:
 			cmd_run = ['ssh','root@%s'%slave_ip,
 					   'cd ~/ElasticPowerTAC-Slave/;python run.py  < /dev/null > /tmp/slave-log 2>&1 &']
 			subprocess.call(cmd_run)
+
 
 		print("Slaves have been initialized!")
 
