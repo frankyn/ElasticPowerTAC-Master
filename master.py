@@ -154,6 +154,7 @@ class ElasticPowerTAC_Master:
 			slave_config['droplet_id'] = self._slaves[x]['id']
 			slave_config['api-key'] = self._config['api-key']
 			slave_config['google-drive'] = self._config['google-drive']
+			slave_config['simulations'] = self._config['simulations']
 			slave_config_file = 'slave.config.json'
 			with open(slave_config_file,'w+') as f:
 				f.write(json.dumps(slave_config))
