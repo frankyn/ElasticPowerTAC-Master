@@ -179,7 +179,7 @@ class ElasticPowerTACMaster:
 
             # Create scenarios path on slave
             cmd_mkdir = ['ssh','root@%s'%slave_ip,
-                         '"mkdir ~/ElasticPowerTAC-Simulation/scenarios"']
+                         'mkdir ~/ElasticPowerTAC-Simulation/scenarios']
 
             # Copy Simulation Files
             for simulation in simulation_config['simulations']:
