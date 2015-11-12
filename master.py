@@ -178,7 +178,7 @@ class ElasticPowerTACMaster:
             subprocess.call(cmd_mcj)
 
             # Create scenarios path on slave
-            cmd_mkdir = ['ssh','root@%s'%slave_ip,
+            cmd_mkdir = ['ssh','log@%s'%slave_ip,
                          'mkdir ~/ElasticPowerTAC-Slave/scenarios']
             subprocess.call(cmd_mkdir)
             # Copy Simulation Files
@@ -205,7 +205,7 @@ class ElasticPowerTACMaster:
 
     # called when google drive is the backup location
     def cleanup_master(self):
-        self._docean.request_delete(self._config['master-droplet-id'])
+        #self._docean.request_delete(self._config['master-droplet-id'])
         print('Goodbye.')
 
 
