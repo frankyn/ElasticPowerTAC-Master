@@ -177,14 +177,22 @@ class ElasticPowerTACMaster:
                        'root@%s:%s' % (slave_ip, '~/ElasticPowerTAC-Slave/config.json')]
             subprocess.call(cmd_mcj)
 
-            # Create scenarios path on slave
-            cmd_mkdir = ['ssh','log%s'%slave_ip,
+            # Create scenarios path on log@slave
+            cmd_mkdir = ['ssh','log@%s'%slave_ip,
                          'mkdir ~/ElasticPowerTAC-Simulation/scenarios']
             subprocess.call(cmd_mkdir)
+
+            # Create scenarios path on slave
+            cmd_mkdir = ['ssh','root@%s'%slave_ip,
+                         'mkdir ~/ElasticPowerTAC-Slave/scenarios']
+            subprocess.call(cmd_mkdir)
+
+
+
             # Copy Simulation Files
             for simulation in simulation_config['simulations']:
                 cmd_cpsim_files = ['scp','scenarios/%s'%simulation['simulation-file-name'],
-                                   'log@%s:~/ElasticPowerTAC-Simulation/scenarios/%s'%(slave_ip,simulation['simulation-file-name'])]
+                                   'log@%s:~/ElasticPowerTAC-Slave/scenarios/%s'%(slave_ip,simulation['simulation-file-name'])]
                 subprocess.call(cmd_cpsim_files)
 
             # SCP google-session.json
