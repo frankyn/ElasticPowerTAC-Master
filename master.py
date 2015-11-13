@@ -192,7 +192,7 @@ class ElasticPowerTACMaster:
             # Copy Simulation Files
             for simulation in simulation_config['simulations']:
                 cmd_cpsim_files = ['scp','scenarios/%s'%simulation['simulation-file-name'],
-                                   'log@%s:~/ElasticPowerTAC-Slave/scenarios/%s'%(slave_ip,simulation['simulation-file-name'])]
+                                   'root@%s:~/ElasticPowerTAC-Slave/scenarios/%s'%(slave_ip,simulation['simulation-file-name'])]
                 subprocess.call(cmd_cpsim_files)
 
             # SCP google-session.json
