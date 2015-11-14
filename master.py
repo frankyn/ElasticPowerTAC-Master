@@ -213,7 +213,7 @@ class ElasticPowerTACMaster:
 
     # called when google drive is the backup location
     def cleanup_master(self):
-        #self._docean.request_delete(self._config['master-droplet-id'])
+        self._docean.request_delete(self._config['master-droplet-id'])
         print('Goodbye.')
 
 
